@@ -10,6 +10,10 @@ export default function HomePage() {
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [groupName, setGroupName] = useState("");
     const [groupDesc, setGroupDesc] = useState("");
+    const [createdGroups, setCreatedGroups] = useState([]);
+    const [showMembersModal, setShowMembersModal] = useState(false);
+    const [membersList, setMembersList] = useState([]);
+    const [memberCounts, setMemberCounts] = useState({});
 
     const navigate = useNavigate();
 
@@ -44,12 +48,38 @@ export default function HomePage() {
         .then(data => setMyGroups(data));
     }, []);
 
+    useEffect(() => {
+        fetch("http://localhost:5000/createdgroups", { credentials: "include" })
+        .then(res => res.json())
+        .then(data => {
+            if (Array.isArray(data)) setCreatedGroups(data);
+        });
+    }, []);
+
+
     function handleLogout() {
         fetch("http://localhost:5000/logout", {
             method: "POST",
             credentials: "include"
         }).then(() => navigate("/login"));
     }
+
+    function refreshAllData() {
+        fetch("http://localhost:5000/groups", { credentials: "include" })
+            .then(res => res.json())
+            .then(data => setAllGroups(data));
+
+        fetch("http://localhost:5000/mygroups", { credentials: "include" })
+            .then(res => res.json())
+            .then(data => setMyGroups(data));
+
+        fetch("http://localhost:5000/createdgroups", { credentials: "include" })
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) setCreatedGroups(data);
+            });
+    }
+
 
     function handleCreateGroup(e) {
         e.preventDefault();
@@ -71,11 +101,8 @@ export default function HomePage() {
             setShowCreateForm(false);
             setGroupName("");
             setGroupDesc("");
-
+            refreshAllData();
             
-            fetch("http://localhost:5000/groups", { credentials: "include" })
-                .then(res => res.json())
-                .then(data => setAllGroups(data));
         });
     }
 
@@ -88,19 +115,60 @@ export default function HomePage() {
         .then(res => res.json())
         .then(data => {
             alert(data.message);
+            refreshAllData();
+        });
+    }
 
-        fetch("http://localhost:5000/mygroups", { credentials: "include" })
-            .then(res => res.json())
-            .then(data => setMyGroups(data));
-
-        fetch("http://localhost:5000/groups", { credentials: "include" })
-            .then(res => res.json())
-            .then(data => setAllGroups(data));
+    function leaveGroup(name) {
+        fetch(`http://localhost:5000/groups/${name}/leave`, {
+            method: "POST",
+            credentials: "include"
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            refreshAllData(); 
         });
     }
 
     function isMember(groupName) {
         return myGroups.some(g => g.name === groupName);
+    }
+
+    function loadMemberCount(groupName) {
+        fetch(`http://localhost:5000/members/${groupName}`, {
+            credentials: "include"
+        })
+        .then(res => res.json())
+        .then(data => {
+            setMemberCounts(prev => ({
+                ...prev,
+                [groupName]: data.length
+            }));
+        });
+    }
+
+    function viewMembers(name) {
+        fetch(`http://localhost:5000/members/${name}`, {
+            credentials: "include"
+        })
+        .then(res => res.json())
+        .then(data => {
+            setMembersList(data);
+            setShowMembersModal(true);
+        });
+    }
+
+    function deleteGroup(name) {
+        fetch(`http://localhost:5000/groups/${name}`, {
+            method: "DELETE",
+            credentials: "include"
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data);
+            refreshAllData();
+        });
     }
 
 
@@ -147,6 +215,27 @@ export default function HomePage() {
                 </div>
             )}
 
+            {showMembersModal && (
+                <div className="modal-overlay">
+                    <div className="modal">
+                        <h2>Group Members</h2>
+
+                        {membersList.length === 0 && <p>No members found.</p>}
+
+                        {membersList.map((m, i) => (
+                            <p key={i}>{m.username}</p>
+                        ))}
+
+                        <button 
+                            className="close-btn" 
+                            onClick={() => setShowMembersModal(false)}
+                        >
+                        Close
+                        </button>
+                    </div>
+                </div>
+            )}
+
 
             <div className="tabs">
                 <button
@@ -162,6 +251,13 @@ export default function HomePage() {
                 >
                     All Groups
                 </button>
+
+                <button
+                    className={activeTab === "created" ? "active" : ""}
+                    onClick={() => setActiveTab("created")}
+                >
+                    Created Groups
+                </button>
             </div>
 
             <div className="group-list">
@@ -170,6 +266,12 @@ export default function HomePage() {
                         <div key={i} className="group-card">
                             <h3>{g.name}</h3>
                             <p>{g.description}</p>
+                            {memberCounts[g.name] === undefined && loadMemberCount(g.name)}
+                            <p>Members: {memberCounts[g.name] ?? "..."}</p>
+                            <button onClick={() => viewMembers(g.name)}>View Members</button>
+                            <button className="leave-button" onClick={() => leaveGroup(g.name)}>
+                                Leave Group
+                            </button>
                         </div>
                     ))}
 
@@ -178,10 +280,30 @@ export default function HomePage() {
                         <div key={i} className="group-card">
                             <h3>{g.name}</h3>
                             <p>{g.description}</p>
+                            {memberCounts[g.name] === undefined && loadMemberCount(g.name)}
+                            <p>Members: {memberCounts[g.name] ?? "..."}</p>
+                            <button onClick={() => viewMembers(g.name)}>View Members</button>
                             <p>Created by: {g.creator_name}</p>
                             {!isMember(g.name) && (
-                                <button onClick={() => joinGroup(g.name)}>
+                                <button className="join-button" onClick={() => joinGroup(g.name)}>
                                 Join Group
+                                </button>
+                            )}
+                        </div>
+                    ))}
+
+                {activeTab === "created" &&
+                    createdGroups.map((g, i) => (
+                        <div key={i} className="group-card">
+                            <h3>{g.name}</h3>
+                            <p>{g.description}</p>
+                            {memberCounts[g.name] === undefined && loadMemberCount(g.name)}
+                            <p>Members: {memberCounts[g.name] ?? "..."}</p>
+                            <button onClick={() => viewMembers(g.name)}>View Members</button>
+                            <p>Created by: {g.creator_name}</p>
+                            {g.creator_name === user.name && (
+                                <button onClick={() => deleteGroup(g.name)} className="delete-btn">
+                                    Delete Group
                                 </button>
                             )}
                         </div>

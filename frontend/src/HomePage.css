@@ -1,12 +1,12 @@
 body {
-    background-color: #2b8eff;
+  background-color: #2b8eff;
 }
 
 header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .logout-btn {
@@ -19,24 +19,24 @@ header {
 }
 
 .home-container {
-    padding: 20px;
+  padding: 20px;
 }
 
 .create-btn {
-    padding: 10px;
-    background: #00da49;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-top: 10px;
+  padding: 10px;
+  background: #00da49;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
 }
 
 .create-form {
-    margin-top: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .tabs {
@@ -71,20 +71,66 @@ header {
 
 
 .group-list {
-    margin-top: 0px;
-    background: var(--tab-bg, #e6e6e6);
-    padding: 20px;
-    border-radius: 0 0 10px 10px;
+  margin-top: 0px;
+  background: var(--tab-bg, #e6e6e6);
+  padding: 20px;
+  border-radius: 0 0 10px 10px;
 
 }
 
 .group-card {
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    margin-bottom: 10px;
-    background: #fafafa;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  background: #fafafa;
 }
+
+.group-card button {
+  padding: 8px 14px;
+  background: #3d61ff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.group-card .join-button {
+  padding: 8px 14px;
+  background: #11c700;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.group-card .leave-button {
+  padding: 8px 14px;
+  background: #ff1717;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+.group-card .delete-btn{
+  padding: 8px 14px;
+  background: #ff1717;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.group-card button:hover {
+  background: #4e4e4e;
+}
+
 
 .modal-overlay {
   position: fixed;
@@ -134,5 +180,15 @@ header {
 
 .modal-buttons button:last-child {
   background: #ccc;
+}
+
+.close-btn {
+  margin-top: 15px;
+  padding: 8px 14px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
