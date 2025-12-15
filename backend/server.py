@@ -160,11 +160,11 @@ def get_my_groups():
     my_groups = group_members.query.filter_by(user_id = current_user.id).all()
     result = []
     for g in my_groups:
-        mygroup = group.query(id = g.group_id).first()
+        mygroup = group.query.filter_by(id = g.group_id).first()
         result.append({
             'name' : mygroup.name,
             'description' : mygroup.description,
-            'creator_name' : group.query.filter_by(id = mygroup.creator_id).first().username
+            'creator_name' : user.query.filter_by(id = mygroup.creator_id).first().username
         })
     return jsonify(result), 200
 
