@@ -136,6 +136,11 @@ def new_group():
     new_group = group(name=name, description=description, creator_id=current_user.id)
 
     db.session.add(new_group)
+
+    group_id = group.query.filter_by(name=new_group.name).first().id
+    new_member = group_members(user_id=current_user.id, group_id=group_id)
+    db.session.add(new_member)
+
     db.session.commit()
     return jsonify("Group is successfully created"), 201
 
@@ -155,7 +160,7 @@ def get_groups():
     return jsonify(result), 200
 
  
-# Find all of my groups
+# Find all of the groups I am in
 @app.route("/mygroups", methods=["GET"])
 @login_required
 def get_my_groups():
@@ -163,6 +168,22 @@ def get_my_groups():
     result = []
     for g in my_groups:
         mygroup = group.query.filter_by(id = g.group_id).first()
+        result.append({
+            'name' : mygroup.name,
+            'description' : mygroup.description,
+            'creator_name' : user.query.filter_by(id = mygroup.creator_id).first().username
+        })
+    return jsonify(result), 200
+
+#See all created Groups
+@app.route("/createdgroups", methods=["GET"])
+@login_required
+def created_groups():
+    my_groups = groups.query.filter_by(creator_id=current_user.id).all()
+    if not my_groups:
+        return jsonify("You have not made any groups"), 400
+    result = []
+    for g in my groups:
         result.append({
             'name' : mygroup.name,
             'description' : mygroup.description,
@@ -191,6 +212,7 @@ def join_group(group_name):
 
     return jsonify({"message": "Successfully joined the group"}), 200
 
+#find all members of a group
 @app.route("/members/<string:group_name>", methods=["GET"])
 @login_required
 def see_members(group_name):
@@ -206,6 +228,20 @@ def see_members(group_name):
             "username" : cur_user.username
         })
     return jsonify(result), 200 
+
+@app.route("/groups/<string:group_name>", methods=["DELETE"])
+@login_required
+def delete_group(group_name):
+    cur_group = group.query.filter_by(name=group_name).first()
+    if not cur_group:
+        return jsonify({"error": "Not a valid group"}), 404
+    posts = post.query.filter_by(group_id=cur_group.id).all()
+    for p in posts:
+        db.session.delete(p)
+
+    db.session.delete(cur_group)
+    db.session.commit()
+    return jsonify("Successfully deleted"), 200
 
 
 """POST ENDPOINTS"""
@@ -245,6 +281,7 @@ def my_posts():
         posts = post.query.filter_by(group_id=g.group_id).all()
         for p in posts:
             result.append({
+                "id" : p.id,
                 "name" : p.name,
                 "description" : p.description,
                 "time_posted" : p.time_posted,
@@ -261,14 +298,40 @@ def group_posts(group_name):
     result = []
     for p in posts:
         result.append({
+            "id" : p.id,
             "name" : p.name,
             "description" : p.description,
             "time_posted" : p.time_posted,
             "deadline" : p.deadline,
             "status" : p.status,
         }) 
-    return jsonify(result), 200      
+    return jsonify(result), 200   
 
+@app.route("/posts/<int:post_id>", methods=["PUT"])
+@login_required
+def update_post(post_id):
+    data = request.json
+    description = data.get("description")
+    deadline_str = data.get("deadline")
+    if not description or not deadline_str:
+        return jsonify("Invalid Input"), 400
+
+    DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+    try:
+        deadline_dt = datetime.strptime(deadline_str, DATETIME_FORMAT)
+    except ValueError:
+        return jsonify({"message": f"Invalid deadline format. Expected format: {DATETIME_FORMAT}"}), 400
+
+    cur_post = post.query.filter_by(id=post_id).first()
+
+    if not cur_post:
+        return jsonify("Not a valid group"), 200
+
+    cur_post.description = description
+    cur_post.deadline = deadline_dt
+    db.session.commit()
+
+    return jsonify("Successfully updated post"), 200
 
 if __name__ == '__main__':
     with app.app_context():
