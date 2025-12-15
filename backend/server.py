@@ -120,25 +120,22 @@ def create_user():
 @login_required
 def new_group():
     data = request.json
-    name = data.get('name')
-    description = data.get('desciption')
+    name = data.get("name")
+    description = data.get("description")
 
     if not name:
         return jsonify('Invalid Input'), 400
 
-    grp = group.query.filter_by(name=name)
+    grp = group.query.filter_by(name=name).first()
     
     if grp:
         return jsonify('Name is Taken'), 403
 
-    new_group = group(name=name, desciption=desciption, creator_id=current_user.id)
+    new_group = group(name=name, description=description, creator_id=current_user.id)
 
     db.session.add(new_group)
     db.session.commit()
     return jsonify("Group is successfully created"), 201
-
-    
-
 
 
 # Returns all available groups
@@ -160,17 +157,36 @@ def get_groups():
 @app.route("/mygroups", methods=["GET"])
 @login_required
 def get_my_groups():
-    my_groups = group_members.query(user_id = current_user.id).all()
+    my_groups = group_members.query.filter_by(user_id = current_user.id).all()
     result = []
-    for g in all_groups:
-        group = groups.query(id = g.group_id).first()
+    for g in my_groups:
+        mygroup = group.query(id = g.group_id).first()
         result.append({
-            'name' : group.name,
-            'description' : group.description,
-            'creator_name' : group.query.filter_by(id = group.creator_id).first().username
+            'name' : mygroup.name,
+            'description' : mygroup.description,
+            'creator_name' : group.query.filter_by(id = mygroup.creator_id).first().username
         })
     return jsonify(result), 200
 
+@app.route("/groups/<string:group_name>", methods=["POST"])
+@login_required
+def join_group(group_name):
+    group_record = group.query.filter_by(name=group_name).first()
+
+    if not group_record:
+        return jsonify({"error": "Not a valid group"}), 404
+
+    existing_membership = group_members.query.filter_by(user_id=current_user.id, group_id=group_record.id).first()
+
+    if existing_membership:
+        return jsonify({"message": "Already a member of this group"}), 409
+
+    group_user = group_members(user_id=current_user.id, group_id=group_record.id)
+
+    db.session.add(group_user)
+    db.session.commit()
+
+    return jsonify({"message": "Successfully joined the group"}), 200
 
 
 
