@@ -66,19 +66,23 @@ class post(db.Model):
 @app.route("/login", methods=["POST"])
 def login():
     data = request.json
-    cur_user = user.query.filter_by(username=data["username"]).first()
+    username = data.get("username")
+    password = data.get("password")
+    cur_user = user.query.filter_by(username=username).first()
 
-    if not cur_user or not cur_user.check_password(data["password"]):
-        return jsonify(url_for(login)), 401
+    if not cur_user or not cur_user.check_password(password):
+        return jsonify("Invalid User"), 401
     
     login_user(cur_user)
-    return jsonify('Login Successful')
+    return jsonify('Login Successful'), 200
 
 @app.route("/logout", methods=["POST"])
 def logout():
     logout_user()
     return jsonify('Logout Successful'), 200
 
+
+#return usersname
 @app.route("/me", methods=["GET"])
 @login_required
 def get_role():
@@ -90,7 +94,7 @@ def get_role():
     }
     return jsonify(result), 200
 
-
+# Creates a new user
 @app.route("/user", methods=["POST"])
 def create_user():
     data = request.json
