@@ -16,7 +16,9 @@ db = SQLAlchemy(app)
 
 login_manager = LoginManager()
 
-
+@login_manager.user_loader
+def load_user(id):
+    return user.query.get(id)
 
 class user(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -76,6 +78,95 @@ def login():
 def logout():
     logout_user()
     return jsonify('Logout Successful'), 200
+
+@app.route("/me", methods=["GET"])
+@login_required
+def get_role():
+    cur_user = user.query.filter_by(id=current_user.id).first()
+    if not cur_user:
+        return jsonify('Not a Valid User'), 400
+    result={
+        "name": cur_user.username
+    }
+    return jsonify(result), 200
+
+
+@app.route("/user", methods=["POST"])
+def create_user():
+    data = request.json
+    username = data.get("username")
+    password = data.get("password")
+
+    if not username or not password:
+        return jsonify('Invalid Input'), 400
+
+    usr = user.query.filter_by(username=username).first()
+    if usr:
+        return jsonify('Username is Taken'), 403
+    new_user = user(username=username)
+    new_user.set_password(password)
+
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify("User is successfully created"), 201
+
+
+# Creates a new group
+@app.route("/groups", methods=["POST"])
+@login_required
+def new_group():
+    data = request.json
+    name = data.get('name')
+    description = data.get('desciption')
+
+    if not name:
+        return jsonify('Invalid Input'), 400
+
+    grp = group.query.filter_by(name=name)
+    
+    if grp:
+        return jsonify('Name is Taken'), 403
+
+    new_group = group(name=name, desciption=desciption, creator_id=current_user.id)
+
+    db.session.add(new_group)
+    db.session.commit()
+    return jsonify("Group is successfully created"), 201
+
+    
+
+
+
+# Returns all available groups
+@app.route("/groups", methods=["GET"])
+@login_required
+def get_groups():
+    all_groups = group.query.all()
+    result = []
+    for g in all_groups:
+        result.append({
+            'name' : g.name,
+            'description' : g.description,
+            'creator_name' : user.query.filter_by(id = g.creator_id).first().username
+        })
+    return jsonify(result), 200
+
+ 
+# Find all of my groups
+@app.route("/mygroups", methods=["GET"])
+@login_required
+def get_my_groups():
+    my_groups = group_members.query(user_id = current_user.id).all()
+    result = []
+    for g in all_groups:
+        group = groups.query(id = g.group_id).first()
+        result.append({
+            'name' : group.name,
+            'description' : group.description,
+            'creator_name' : group.query.filter_by(id = group.creator_id).first().username
+        })
+    return jsonify(result), 200
+
 
 
 
