@@ -179,15 +179,15 @@ def get_my_groups():
 @app.route("/createdgroups", methods=["GET"])
 @login_required
 def created_groups():
-    my_groups = groups.query.filter_by(creator_id=current_user.id).all()
+    my_groups = group.query.filter_by(creator_id=current_user.id).all()
     if not my_groups:
         return jsonify("You have not made any groups"), 400
     result = []
-    for g in my groups:
+    for g in my_groups:
         result.append({
-            'name' : mygroup.name,
-            'description' : mygroup.description,
-            'creator_name' : user.query.filter_by(id = mygroup.creator_id).first().username
+            'name' : g.name,
+            'description' : g.description,
+            'creator_name' : user.query.filter_by(id = g.creator_id).first().username
         })
     return jsonify(result), 200
 
