@@ -1,3 +1,138 @@
 body {
     background-color: #2b8eff;
 }
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.logout-btn {
+  padding: 14px 14px;
+  background: #f32525;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.home-container {
+    padding: 20px;
+}
+
+.create-btn {
+    padding: 10px;
+    background: #00da49;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.create-form {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-top: 25px;
+  width: 100%; 
+  background: var(--tab-bg, #e6e6e6);
+  padding: 10px 0;
+  border-radius: 10px 10px 0 0;
+}
+
+.tabs button {
+  flex: 1;                    
+  max-width: 438px;            
+  padding: 15px 0;
+  background: #ffffff;
+  border: 1px;
+  border-color: black;
+  border-radius: 0;           
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 500;
+  transition: 0.2s ease;
+}
+
+.tabs .active {
+  background: #e6e6e6;
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+}
+
+
+.group-list {
+    margin-top: 0px;
+    background: var(--tab-bg, #e6e6e6);
+    padding: 20px;
+    border-radius: 0 0 10px 10px;
+
+}
+
+.group-card {
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    background: #fafafa;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  width: 350px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.modal input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.modal-buttons button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.modal-buttons button:first-child {
+  background: #007bff;
+  color: white;
+}
+
+.modal-buttons button:last-child {
+  background: #ccc;
+}
+
