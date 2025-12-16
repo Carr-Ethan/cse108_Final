@@ -1,0 +1,146 @@
+.posts-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
+  font-family: Arial, sans-serif;
+}
+
+.posts-container h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.back-btn,
+.create-post-btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 10px;
+  margin-bottom: 20px;
+}
+
+.back-btn {
+  background: #444;
+  color: white;
+}
+
+.back-btn:hover {
+  background: #333;
+}
+
+.create-post-btn {
+  background: #007bff;
+  color: white;
+}
+
+.create-post-btn:hover {
+  background: #0066d6;
+}
+
+
+.posts-list {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+
+.post-card {
+  background: white;
+  padding: 18px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  border-left: 5px solid #007bff;
+}
+
+.post-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 20px;
+}
+
+.post-card p {
+  margin: 4px 0;
+  color: #444;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+}
+
+
+.modal {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  width: 380px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.modal h2 {
+  margin-bottom: 15px;
+}
+
+
+.modal input {
+  width: 95%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+}
+
+
+.modal button {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.modal button[type="submit"] {
+  background: #007bff;
+  color: white;
+}
+
+.modal button[type="submit"]:hover {
+  background: #0066d6;
+}
+
+.modal button[type="button"] {
+  background: #ccc;
+}
+
+.modal button[type="button"]:hover {
+  background: #b3b3b3;
+}
+
+.edit-btn {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.edit-btn:hover {
+    background-color: #5c5c5c;
+}
+
