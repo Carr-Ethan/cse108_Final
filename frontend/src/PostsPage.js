@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';    
+import DataTable from "./components/datatable";
 import "./PostsPage.css";
 
 export default function PostsPage() {
@@ -17,6 +20,43 @@ export default function PostsPage() {
     const [sortOrder, setSortOrder] = useState("none");
 
     const navigate = useNavigate();
+
+    const columns = [
+        { key: 'name', header: 'Group Name' },
+        { key: 'description', header: 'Description' },
+        { key: "time_posted", header: "Time Posted"},
+        { key: 'deadline', header: 'Deadline'},
+        { key: "status", header: "Status"},
+        { 
+            key: 'actions', 
+            header: 'Edit',
+            cellRenderer: (row) => (
+                <button 
+                    onClick={() => {
+                        setEditPostId(row.id);
+                        setEditDescription(row.description);
+                        setEditDeadline(row.deadline);
+                        setShowEditModal(true);
+                    }} 
+                    className="edit-btn"
+                >
+                    Edit <EditIcon sx={{ fontSize: 15 }}/>
+                </button>
+            )
+        },
+        { 
+            key: 'actions', 
+            header: 'Delete',
+            cellRenderer: (row) => (
+                <button 
+                    onClick={() => deletePost(row.id)} 
+                    className="delete-btn"
+                >
+                    Delete <DeleteIcon sx={{ fontSize: 15 }}/>
+                </button>
+            )
+        },
+    ];
 
     useEffect(() => {
         fetch("http://localhost:5000/posts", {
@@ -229,34 +269,14 @@ export default function PostsPage() {
             </div>
 
             <div className="posts-list">
-                {filteredPosts.map((p, i) => (
-                    <div key={i} className="post-card">
-                        <h3>{p.name}</h3>
-                        <p>{p.description}</p>
-                        <p>Posted: {p.time_posted}</p>
-                        <p>Deadline: {p.deadline}</p>
-                        <p>Status: {p.status}</p>
-
-                        <button
-                            className="edit-btn"
-                            onClick={() => {
-                                setEditPostId(p.id);
-                                setEditDescription(p.description);
-                                setEditDeadline(p.deadline);
-                                setShowEditModal(true);
-                            }}
-                        >
-                            Edit
-                        </button>
-
-                        <button
-                            className="delete-btn"
-                            onClick={() => deletePost(p.id)}
-                        >
-                            Delete
-                        </button>
-                    </div>
-                ))}
+                {filteredPosts.length > 0 ? (
+                    <DataTable 
+                        data={filteredPosts} 
+                        columns={columns} 
+                    />
+                ) : (
+                    <p className="no-posts-message">No posts found matching your criteria.</p>
+                )}
             </div>
         </div>
     );

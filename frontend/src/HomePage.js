@@ -430,7 +430,6 @@ function leaveGroup(name) {
                 )}
 
                 {activeTab === "created" &&
-                    createdGroups.map((g, i) => (
                     <>
                         <div className="search-container">
                             <input
@@ -447,7 +446,7 @@ function leaveGroup(name) {
                             columns={createdGroupColumns} 
                         />
                     </>
-                    ))}
+                }
             </div>
         </div>
     );
