@@ -13,6 +13,8 @@ export default function PostsPage() {
     const [editDescription, setEditDescription] = useState("");
     const [editDeadline, setEditDeadline] = useState("");
     const [myGroups, setMyGroups] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [sortOrder, setSortOrder] = useState("none");
 
     const navigate = useNavigate();
 
@@ -98,8 +100,6 @@ export default function PostsPage() {
         });
     }
 
-
-
     function refreshPosts() {
         fetch("http://localhost:5000/posts", {
             credentials: "include"
@@ -107,6 +107,20 @@ export default function PostsPage() {
         .then(res => res.json())
         .then(data => setPosts(data));
     }
+
+    const filteredPosts = posts
+        .filter(p =>
+            p.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .sort((a, b) => {
+            if (sortOrder === "asc") {
+                return new Date(a.deadline) - new Date(b.deadline);
+            }
+            if (sortOrder === "desc") {
+                return new Date(b.deadline) - new Date(a.deadline);
+            }
+            return 0;
+        })
 
     return (
         <div className="posts-container">
@@ -194,8 +208,28 @@ export default function PostsPage() {
                 </div>
             )}
 
+            <div className="search-filter-container">
+                <input
+                    type="text"
+                    placeholder="Search by group name..."
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                    className="search-bar"
+                />
+
+                <select
+                    value={sortOrder}
+                    onChange={e => setSortOrder(e.target.value)}
+                    className="sort-select"
+                >
+                    <option value="none">None</option>
+                    <option value="asc">Earliest first</option>
+                    <option value="desc">Latest first</option>
+                </select>
+            </div>
+
             <div className="posts-list">
-                {posts.map((p, i) => (
+                {filteredPosts.map((p, i) => (
                     <div key={i} className="post-card">
                         <h3>{p.name}</h3>
                         <p>{p.description}</p>
