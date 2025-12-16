@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./HomePage.css";
+import LogoutIcon from '@mui/icons-material/Logout';
+import DataTable from "./components/datatable";
 
 export default function HomePage() {
     const [user, setUser] = useState(null);
@@ -14,8 +16,48 @@ export default function HomePage() {
     const [showMembersModal, setShowMembersModal] = useState(false);
     const [membersList, setMembersList] = useState([]);
     const [memberCounts, setMemberCounts] = useState({});
+    const [loading, setLoading] = useState(false)
 
     const navigate = useNavigate();
+
+    const columns = [
+        { key: 'name', header: 'Group Name' },
+        { key: 'description', header: 'Description' },
+        { 
+            key: 'members', 
+            header: 'Members',
+            cellRenderer: (row) => {
+                const count = memberCounts[row.name];
+                return count !== undefined ? (
+                    <>
+                        <span onClick={() => viewMembers(row.name)} className="member-count-link">
+                            {count}
+                        </span>
+                    </>
+                ) : (
+                    <>
+                        {memberCounts[row.name] === undefined && loadMemberCount(row.name)}
+                        {'...'} 
+                    </>
+                );
+            }
+        },
+        { 
+            key: 'actions', 
+            header: 'Actions',
+            cellRenderer: (row) => {
+                const isMemberOfGroup = isMember(row.name);         
+                return (
+                    <button 
+                        onClick={() => isMemberOfGroup ? leaveGroup(row.name) : joinGroup(row.name)}
+                        className={isMemberOfGroup ? "leave-button" : "join-button"}
+                    >
+                        {isMemberOfGroup ? "Leave Group" : "Join Group"}
+                    </button>
+                );
+            }
+        },
+    ];
 
     useEffect(() => {
         fetch("http://localhost:5000/me", {
@@ -108,7 +150,7 @@ export default function HomePage() {
 
     
     function joinGroup(name) {
-        fetch(`http://localhost:5000/groups/${name}`, {
+        fetch(`http://localhost:5000/groups/${encodeURIComponent(name)}`, {
             method: "POST",
             credentials: "include"
         })
@@ -119,24 +161,35 @@ export default function HomePage() {
         });
     }
 
-    function leaveGroup(name) {
-        fetch(`http://localhost:5000/groups/${name}/leave`, {
-            method: "POST",
-            credentials: "include"
-        })
-        .then(res => res.json())
-        .then(data => {
-            alert(data.message);
-            refreshAllData(); 
-        });
-    }
+function leaveGroup(name) {
+    fetch(`http://localhost:5000/groups/${encodeURIComponent(name)}/leave`, {
+        method: "DELETE",
+        credentials: "include"
+    })
+    .then(async res => {
+        const data = await res.json();
+        if (!res.ok) {
+            throw new Error(data.error || "Failed to leave group");
+        }
+
+        return data;
+    })
+    .then(data => {
+        alert(data.message);
+        refreshAllData();
+    })
+    .catch(err => {
+        alert(err.message);
+    });
+}
+
 
     function isMember(groupName) {
         return myGroups.some(g => g.name === groupName);
     }
 
     function loadMemberCount(groupName) {
-        fetch(`http://localhost:5000/members/${groupName}`, {
+        fetch(`http://localhost:5000/members/${encodeURIComponent(groupName)}`, {
             credentials: "include"
         })
         .then(res => res.json())
@@ -149,7 +202,7 @@ export default function HomePage() {
     }
 
     function viewMembers(name) {
-        fetch(`http://localhost:5000/members/${name}`, {
+        fetch(`http://localhost:5000/members/${encodeURIComponent(name)}`, {
             credentials: "include"
         })
         .then(res => res.json())
@@ -160,7 +213,7 @@ export default function HomePage() {
     }
 
     function deleteGroup(name) {
-        fetch(`http://localhost:5000/groups/${name}`, {
+        fetch(`http://localhost:5000/groups/${encodeURIComponent(name)}`, {
             method: "DELETE",
             credentials: "include"
         })
@@ -179,7 +232,7 @@ export default function HomePage() {
         <div className="home-container">
             <header>
             <h1>Welcome, {user.name}</h1>
-            <button onClick={handleLogout} className="logout-btn">Logout</button>
+            <button onClick={handleLogout} className="logout-btn">Logout <LogoutIcon sx={{ fontSize: 12 }}></LogoutIcon></button>
             </header>
             <button className="create-btn" onClick={() => setShowCreateForm(true)}>
                 Create New Group
@@ -275,22 +328,17 @@ export default function HomePage() {
                         </div>
                     ))}
 
-                {activeTab === "allgroups" &&
-                    allGroups.map((g, i) => (
-                        <div key={i} className="group-card">
-                            <h3>{g.name}</h3>
-                            <p>{g.description}</p>
-                            {memberCounts[g.name] === undefined && loadMemberCount(g.name)}
-                            <p>Members: {memberCounts[g.name] ?? "..."}</p>
-                            <button onClick={() => viewMembers(g.name)}>View Members</button>
-                            <p>Created by: {g.creator_name}</p>
-                            {!isMember(g.name) && (
-                                <button className="join-button" onClick={() => joinGroup(g.name)}>
-                                Join Group
-                                </button>
-                            )}
-                        </div>
-                    ))}
+                {activeTab === "allgroups" && (
+                <> 
+                    <div className="data-table-view">
+                    <DataTable 
+                        isLoading={loading} 
+                        data={allGroups} 
+                        columns={columns} 
+                    />
+                    </div>
+                </>
+                )}
 
                 {activeTab === "created" &&
                     createdGroups.map((g, i) => (

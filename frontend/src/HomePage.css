@@ -10,10 +10,10 @@ header {
 }
 
 .logout-btn {
-  padding: 14px 14px;
+  padding: 7px 7px;
   background: #f32525;
   color: white;
-  border: none;
+  border: 1px solid black;
   border-radius: 6px;
   cursor: pointer;
 }
@@ -30,6 +30,7 @@ header {
   border-radius: 6px;
   cursor: pointer;
   margin-top: 10px;
+  border: 1px solid black;
 }
 
 .create-form {
