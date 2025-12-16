@@ -241,7 +241,24 @@ def delete_group(group_name):
 
     db.session.delete(cur_group)
     db.session.commit()
-    return jsonify("Successfully deleted"), 200
+    return jsonify({"message" : "Successfully deleted"}), 200
+
+@app.route("/groups/<string:group_name>/leave", methods=["DELETE"])
+@login_required
+def leave_group(group_name):
+    grp = group.query.filter_by(name=group_name).first()
+    if not grp:
+        return jsonify({"error": "Not a valid group"}), 404
+    enrollemnt = group_members.query.filter_by(user_id=current_user.id, group_id=grp.id).first()
+    if not enrollemnt:
+        return jsonify({"error": "You are not part of this group"}), 400
+    if grp.creator_id == current_user.id:
+        return jsonify({"error": "You created this group"}), 400
+
+    db.session.delete(enrollemnt)
+    db.session.commit()
+
+    return jsonify({"message" : "Successfully left the group"}), 200
 
 
 """POST ENDPOINTS"""
@@ -332,6 +349,17 @@ def update_post(post_id):
     db.session.commit()
 
     return jsonify("Successfully updated post"), 200
+
+@app.route("/posts/<int:post_id>", methods=["DELETE"])
+@login_required
+def delete_post(post_id):
+    cur_post = post.query.filter_by(id=post_id).first()
+
+    if not cur_post:
+        return jsonify({"error" : "post not found"}), 200
+    db.session.delete(cur_post)
+    db.session.commit()
+    return jsonify({"message" : "Deleted Post"}), 200
 
 if __name__ == '__main__':
     with app.app_context():
