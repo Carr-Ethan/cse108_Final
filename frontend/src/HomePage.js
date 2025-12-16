@@ -21,6 +21,7 @@ export default function HomePage() {
     const [showMembersModal, setShowMembersModal] = useState(false);
     const [membersList, setMembersList] = useState([]);
     const [memberCounts, setMemberCounts] = useState({});
+    const [searchTerm, setSearchTerm] = useState("");
 
     const navigate = useNavigate();
 
@@ -282,6 +283,18 @@ function leaveGroup(name) {
 
     if (!user) return <h2>Loading...</h2>;
 
+    const filteredMyGroups = myGroups.filter(g =>
+        g.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const filteredAllGroups = allGroups.filter(g =>
+        g.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const filteredCreatedGroups = createdGroups.filter(g =>
+        g.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <div className="home-container">
             <header>
@@ -376,22 +389,42 @@ function leaveGroup(name) {
 
             <div className="group-list">
                 {activeTab === "mygroups" && (
-                                    <> 
+                    <>
+                    <div className="search-container">
+                        <input
+                            type="text"
+                            placeholder="Search groups..."
+                            value={searchTerm}
+                            onChange={e => setSearchTerm(e.target.value)}
+                            className="search-bar"
+                        />
+                    </div>
+
                     <div className="data-table-view">
                     <DataTable  
-                        data={myGroups} 
+                        data={filteredMyGroups} 
                         columns={columns} 
                     />
                     </div>
                 </>)}
 
                 {activeTab === "allgroups" && (
-                <> 
+                <>  
+                    <div className="search-container">
+                        <input
+                            type="text"
+                            placeholder="Search groups..."
+                            value={searchTerm}
+                            onChange={e => setSearchTerm(e.target.value)}
+                            className="search-bar"
+                        />
+                    </div>
+
                     <div className="data-table-view">
-                    <DataTable 
-                        data={allGroups} 
-                        columns={columns} 
-                    />
+                        <DataTable 
+                            data={filteredAllGroups} 
+                            columns={columns} 
+                        />
                     </div>
                 </>
                 )}
@@ -399,8 +432,18 @@ function leaveGroup(name) {
                 {activeTab === "created" &&
                     createdGroups.map((g, i) => (
                     <>
+                        <div className="search-container">
+                            <input
+                                type="text"
+                                placeholder="Search groups..."
+                                value={searchTerm}
+                                onChange={e => setSearchTerm(e.target.value)}
+                                className="search-bar"
+                            />
+                        </div>
+
                         <DataTable
-                            data={createdGroups} 
+                            data={filteredCreatedGroups} 
                             columns={createdGroupColumns} 
                         />
                     </>
