@@ -214,6 +214,7 @@ export default function HomePage() {
     }
 
 function leaveGroup(name) {
+    if (!window.confirm(`Leave group "${name}"?`)) return;
     fetch(`http://localhost:5000/groups/${encodeURIComponent(name)}/leave`, {
         method: "DELETE",
         credentials: "include"
@@ -234,6 +235,7 @@ function leaveGroup(name) {
         alert(err.message);
     });
 }
+
 
 
     function isMember(groupName) {
@@ -265,13 +267,14 @@ function leaveGroup(name) {
     }
 
     function deleteGroup(name) {
+        if (!window.confirm("Are you sure you want to delete this Group?")) return;
         fetch(`http://localhost:5000/groups/${encodeURIComponent(name)}`, {
             method: "DELETE",
             credentials: "include"
         })
         .then(res => res.json())
         .then(data => {
-            alert(data);
+            alert("Group had been Deleted.");
             refreshAllData();
         });
     }

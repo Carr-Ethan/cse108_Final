@@ -144,3 +144,37 @@
     background-color: #5c5c5c;
 }
 
+.delete-btn {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    margin-left: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.delete-btn:hover {
+    background-color: #535353;
+}
+
+select {
+    padding: 10px 14px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+select:hover {
+    border-color: #888;
+}
+
+select:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 4px rgba(74, 144, 226, 0.5);
+    outline: none;
+}
