@@ -193,3 +193,15 @@ header {
   cursor: pointer;
 }
 
+.posts-btn {
+  margin-left: 10px;
+  padding: 10px 16px;
+  background: #6c63ff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.posts-btn:hover {
+  background: #5a54d6;
+}

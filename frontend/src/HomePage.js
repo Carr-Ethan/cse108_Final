@@ -237,6 +237,13 @@ function leaveGroup(name) {
             <button className="create-btn" onClick={() => setShowCreateForm(true)}>
                 Create New Group
             </button>
+            <button 
+                className="posts-btn" 
+                onClick={() => navigate("/posts")}
+            >
+            View Your Posts
+            </button>
+
 
             {showCreateForm && (
                 <div className="modal-overlay">
