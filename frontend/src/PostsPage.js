@@ -21,6 +21,8 @@ export default function PostsPage() {
 
     const navigate = useNavigate();
 
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
     const columns = [
         { key: 'name', header: 'Group Name' },
         { key: 'description', header: 'Description' },
@@ -59,7 +61,7 @@ export default function PostsPage() {
     ];
 
     useEffect(() => {
-        fetch("http://localhost:5000/posts", {
+        fetch(`${API_BASE_URL}/posts`, {
             credentials: "include"
         })
         .then(res => res.json())
@@ -67,7 +69,7 @@ export default function PostsPage() {
     }, []);
 
     useEffect(() => {
-        fetch("http://localhost:5000/mygroups", {
+        fetch(`${API_BASE_URL}/mygroups`, {
             credentials: "include"
         })
         .then(res => res.json())
@@ -80,7 +82,7 @@ export default function PostsPage() {
 
         const formattedDeadline = deadline.replace("T", " ") + ":00";
 
-        fetch("http://localhost:5000/posts", {
+        fetch(`${API_BASE_URL}/posts`, {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
@@ -109,7 +111,7 @@ export default function PostsPage() {
 
         const formattedDeadline = editDeadline.replace("T", " ") + ":00";
 
-        fetch(`http://localhost:5000/posts/${editPostId}`, {
+        fetch(`${API_BASE_URL}/posts/${editPostId}`, {
             method: "PUT",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
@@ -129,7 +131,7 @@ export default function PostsPage() {
     function deletePost(postId) {
         if (!window.confirm("Are you sure you want to delete this post?")) return;
 
-        fetch(`http://localhost:5000/posts/${postId}`, {
+        fetch(`${API_BASE_URL}/posts/${postId}`, {
             method: "DELETE",
             credentials: "include"
         })
@@ -141,7 +143,7 @@ export default function PostsPage() {
     }
 
     function refreshPosts() {
-        fetch("http://localhost:5000/posts", {
+        fetch(`${API_BASE_URL}/posts`, {
             credentials: "include"
         })
         .then(res => res.json())

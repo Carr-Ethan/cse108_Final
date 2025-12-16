@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./LoginPage.css";
 
 export default function SignupPage() {
@@ -7,10 +7,12 @@ export default function SignupPage() {
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
     function handleSignup(e) {
         e.preventDefault();
 
-        fetch("http://localhost:5000/user", {
+        fetch(`${API_BASE_URL}/user`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -50,7 +52,7 @@ export default function SignupPage() {
                 <button type="submit">Create Account</button>
             </form>
 
-            <p>Already have an account? <a href="/login">Sign in!</a></p>
+            <p>Already have an account? <Link to="/login">Sign in!</Link></p>
         </div>
     );
 }

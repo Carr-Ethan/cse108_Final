@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./LoginPage.css";
 import LoginIcon from '@mui/icons-material/Login';
 
@@ -8,10 +8,12 @@ export default function LoginPage() {
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
     function handleSubmit(e) {
         e.preventDefault();
 
-        fetch("http://localhost:5000/login", {
+        fetch(`${API_BASE_URL}/login`, {
             method: "POST",
             credentials: "include",
             headers: {
@@ -49,7 +51,7 @@ export default function LoginPage() {
                 <button type="submit">Login <LoginIcon sx={{ fontSize: 12 }}></LoginIcon></button>
             </form>
 
-            <p> Don't have an account? <a href="/signup">Sign up!</a></p>
+            <p> Don't have an account? <Link to="/signup">Sign up!</Link></p>
         </div>
     );
 }

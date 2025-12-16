@@ -25,6 +25,8 @@ export default function HomePage() {
 
     const navigate = useNavigate();
 
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
     const membersCellRenderer = (row) => {
         const count = memberCounts[row.name];
         return count !== undefined ? (
@@ -113,7 +115,7 @@ export default function HomePage() {
 
 
     useEffect(() => {
-        fetch("http://localhost:5000/me", {
+        fetch(`${API_BASE_URL}/me`, {
             method: "GET",
             credentials: "include"
         })
@@ -130,13 +132,13 @@ export default function HomePage() {
     }, [navigate]);
 
     useEffect(() => {
-        fetch("http://localhost:5000/groups", {
+        fetch(`${API_BASE_URL}/groups`, {
             credentials: "include"
         })
         .then(res => res.json())
         .then(data => setAllGroups(data));
 
-        fetch("http://localhost:5000/mygroups", {
+        fetch(`${API_BASE_URL}/mygroups`, {
             credentials: "include"
         })
         .then(res => res.json())
@@ -144,7 +146,7 @@ export default function HomePage() {
     }, []);
 
     useEffect(() => {
-        fetch("http://localhost:5000/createdgroups", { credentials: "include" })
+        fetch(`${API_BASE_URL}/createdgroups`, { credentials: "include" })
         .then(res => res.json())
         .then(data => {
             if (Array.isArray(data)) setCreatedGroups(data);
@@ -153,22 +155,22 @@ export default function HomePage() {
 
 
     function handleLogout() {
-        fetch("http://localhost:5000/logout", {
+        fetch(`${API_BASE_URL}/logout`, {
             method: "POST",
             credentials: "include"
         }).then(() => navigate("/login"));
     }
 
     function refreshAllData() {
-        fetch("http://localhost:5000/groups", { credentials: "include" })
+        fetch(`${API_BASE_URL}/groups`, { credentials: "include" })
             .then(res => res.json())
             .then(data => setAllGroups(data));
 
-        fetch("http://localhost:5000/mygroups", { credentials: "include" })
+        fetch(`${API_BASE_URL}/mygroups`, { credentials: "include" })
             .then(res => res.json())
             .then(data => setMyGroups(data));
 
-        fetch("http://localhost:5000/createdgroups", { credentials: "include" })
+        fetch(`${API_BASE_URL}/createdgroups`, { credentials: "include" })
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) setCreatedGroups(data);
@@ -179,7 +181,7 @@ export default function HomePage() {
     function handleCreateGroup(e) {
         e.preventDefault();
 
-        fetch("http://localhost:5000/groups", {
+        fetch(`${API_BASE_URL}/groups`, {
             method: "POST",
             credentials: "include",
             headers: {
@@ -203,7 +205,7 @@ export default function HomePage() {
 
     
     function joinGroup(name) {
-        fetch(`http://localhost:5000/groups/${encodeURIComponent(name)}`, {
+        fetch(`${API_BASE_URL}/groups/${encodeURIComponent(name)}`, {
             method: "POST",
             credentials: "include"
         })
@@ -216,7 +218,7 @@ export default function HomePage() {
 
 function leaveGroup(name) {
     if (!window.confirm(`Leave group "${name}"?`)) return;
-    fetch(`http://localhost:5000/groups/${encodeURIComponent(name)}/leave`, {
+    fetch(`${API_BASE_URL}/groups/${encodeURIComponent(name)}/leave`, {
         method: "DELETE",
         credentials: "include"
     })
@@ -244,7 +246,7 @@ function leaveGroup(name) {
     }
 
     function loadMemberCount(groupName) {
-        fetch(`http://localhost:5000/members/${encodeURIComponent(groupName)}`, {
+        fetch(`${API_BASE_URL}/members/${encodeURIComponent(groupName)}`, {
             credentials: "include"
         })
         .then(res => res.json())
@@ -257,7 +259,7 @@ function leaveGroup(name) {
     }
 
     function viewMembers(name) {
-        fetch(`http://localhost:5000/members/${encodeURIComponent(name)}`, {
+        fetch(`${API_BASE_URL}/members/${encodeURIComponent(name)}`, {
             credentials: "include"
         })
         .then(res => res.json())
@@ -269,7 +271,7 @@ function leaveGroup(name) {
 
     function deleteGroup(name) {
         if (!window.confirm("Are you sure you want to delete this Group?")) return;
-        fetch(`http://localhost:5000/groups/${encodeURIComponent(name)}`, {
+        fetch(`${API_BASE_URL}/groups/${encodeURIComponent(name)}`, {
             method: "DELETE",
             credentials: "include"
         })
