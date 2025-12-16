@@ -7,7 +7,6 @@ import GroupRemoveIcon from '@mui/icons-material/GroupRemove';
 import PeopleIcon from '@mui/icons-material/People';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DataTable from "./components/datatable";
-import CreatedGroupsTable from "./components/createdGroupsTable";
 
 export default function HomePage() {
     const [user, setUser] = useState(null);
@@ -129,7 +128,7 @@ export default function HomePage() {
         .then(data => {
             if (data) setUser(data);
         });
-    }, [navigate]);
+    }, [navigate, API_BASE_URL]);
 
     useEffect(() => {
         fetch(`${API_BASE_URL}/groups`, {
@@ -143,7 +142,7 @@ export default function HomePage() {
         })
         .then(res => res.json())
         .then(data => setMyGroups(data));
-    }, []);
+    }, [API_BASE_URL]);
 
     useEffect(() => {
         fetch(`${API_BASE_URL}/createdgroups`, { credentials: "include" })
@@ -151,7 +150,7 @@ export default function HomePage() {
         .then(data => {
             if (Array.isArray(data)) setCreatedGroups(data);
         });
-    }, []);
+    }, [API_BASE_URL]);
 
 
     function handleLogout() {
@@ -162,6 +161,7 @@ export default function HomePage() {
     }
 
     function refreshAllData() {
+        setMemberCounts({});
         fetch(`${API_BASE_URL}/groups`, { credentials: "include" })
             .then(res => res.json())
             .then(data => setAllGroups(data));
@@ -216,28 +216,28 @@ export default function HomePage() {
         });
     }
 
-function leaveGroup(name) {
-    if (!window.confirm(`Leave group "${name}"?`)) return;
-    fetch(`${API_BASE_URL}/groups/${encodeURIComponent(name)}/leave`, {
-        method: "DELETE",
-        credentials: "include"
-    })
-    .then(async res => {
-        const data = await res.json();
-        if (!res.ok) {
-            throw new Error(data.error || "Failed to leave group");
-        }
+    function leaveGroup(name) {
+        if (!window.confirm(`Leave group "${name}"?`)) return;
+        fetch(`${API_BASE_URL}/groups/${encodeURIComponent(name)}/leave`, {
+            method: "DELETE",
+            credentials: "include"
+        })
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.error || "Failed to leave group");
+            }
 
-        return data;
-    })
-    .then(data => {
-        alert(data.message);
-        refreshAllData();
-    })
-    .catch(err => {
-        alert(err.message);
-    });
-}
+            return data;
+        })
+        .then(data => {
+            alert(data.message);
+            refreshAllData();
+        })
+        .catch(err => {
+            alert(err.message);
+        });
+    }
 
 
 
@@ -271,16 +271,31 @@ function leaveGroup(name) {
 
     function deleteGroup(name) {
         if (!window.confirm("Are you sure you want to delete this Group?")) return;
+
         fetch(`${API_BASE_URL}/groups/${encodeURIComponent(name)}`, {
             method: "DELETE",
             credentials: "include"
         })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(err => {
+                    throw new Error(err.message || 'Deletion failed.');
+                });
+            }
+            return res.json();
+        })
         .then(data => {
-            alert("Group had been Deleted.");
-            refreshAllData();
+            alert(data.message || "Group has been deleted successfully.");
+
+            setCreatedGroups(prev => prev.filter(g => g.name !== name));
+            setAllGroups(prev => prev.filter(g => g.name !== name));
+            setMyGroups(prev => prev.filter(g => g.name !== name));
+        })
+        .catch(error => {
+            alert(`Error deleting group: ${error.message}`);
         });
     }
+
 
 
     if (!user) return <h2>Loading...</h2>;

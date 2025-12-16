@@ -6,15 +6,24 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_admin import Admin, AdminIndexView
 from datetime import datetime
 
+REACT_FRONTEND_URL = "https://Carr-Ethan.github.io"
+# REACT_FRONTEND_URL = "http://localhost:3000"
+
 app = Flask(__name__)
-CORS(app, origins='http://localhost:3000', supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": REACT_FRONTEND_URL}}, supports_credentials=True)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SECRET_KEY'] = "very secret"
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
 
-db = SQLAlchemy(app)
+db = SQLAlchemy()
 
 login_manager = LoginManager()
+
+with app.app_context():
+    db.init_app(app)  
+    login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(id):
@@ -330,7 +339,8 @@ def update_post(post_id):
     data = request.json
     description = data.get("description")
     deadline_str = data.get("deadline")
-    if not description or not deadline_str:
+    status = data.get("status")
+    if not description or not deadline_str or not status:
         return jsonify("Invalid Input"), 400
 
     DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -346,6 +356,7 @@ def update_post(post_id):
 
     cur_post.description = description
     cur_post.deadline = deadline_dt
+    cur_post.status = status
     db.session.commit()
 
     return jsonify("Successfully updated post"), 200

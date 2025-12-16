@@ -24,7 +24,7 @@ header {
 
 .create-btn {
   padding: 10px;
-  background: #00da49;
+  background: #46c06f;
   color: white;
   border: none;
   border-radius: 6px;
@@ -99,7 +99,7 @@ header {
 
 .join-button {
   padding: 8px 14px;
-  background: #11c700;
+  background: #66cc5d;
   color: white;
   border: none;
   border-radius: 6px;
@@ -116,7 +116,7 @@ header {
 
 .leave-button, .delete-btn {
   padding: 8px 14px;
-  background: #ff1717;
+  background: #f84343;
   color: white;
   border: none;
   border-radius: 6px;
@@ -132,7 +132,7 @@ header {
 
 .group-card .delete-btn{
   padding: 8px 14px;
-  background: #ff1717;
+  background: #fa3535;
   color: white;
   border: none;
   border-radius: 6px;
@@ -209,8 +209,8 @@ header {
   margin-left: 10px;
   padding: 10px 16px;
   background: #6c63ff;
+  border: 1px solid black;
   color: white;
-  border: none;
   border-radius: 6px;
   cursor: pointer;
 }

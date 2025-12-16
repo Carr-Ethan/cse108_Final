@@ -18,11 +18,28 @@ export default function PostsPage() {
     const [myGroups, setMyGroups] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [sortOrder, setSortOrder] = useState("none");
+    const [editStatus, setEditStatus] = useState("");
 
     const navigate = useNavigate();
 
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
+    const formatForInput = (dateTimeString) => {
+        if (!dateTimeString) {
+            return "";
+        }
+
+        const date = new Date(dateTimeString);
+        
+        if (isNaN(date.getTime())) {
+            console.error("Invalid date string received:", dateTimeString);
+            return ""; 
+        }
+
+        let isoString = date.toISOString();
+
+        return isoString.substring(0, 16);
+    };
     const columns = [
         { key: 'name', header: 'Group Name' },
         { key: 'description', header: 'Description' },
@@ -30,14 +47,15 @@ export default function PostsPage() {
         { key: 'deadline', header: 'Deadline'},
         { key: "status", header: "Status"},
         { 
-            key: 'actions', 
+            key: 'action1', 
             header: 'Edit',
             cellRenderer: (row) => (
                 <button 
                     onClick={() => {
                         setEditPostId(row.id);
                         setEditDescription(row.description);
-                        setEditDeadline(row.deadline);
+                        setEditDeadline(formatForInput(row.deadline)); 
+                        setEditStatus(row.status);
                         setShowEditModal(true);
                     }} 
                     className="edit-btn"
@@ -47,7 +65,7 @@ export default function PostsPage() {
             )
         },
         { 
-            key: 'actions', 
+            key: 'action2', 
             header: 'Delete',
             cellRenderer: (row) => (
                 <button 
@@ -66,7 +84,7 @@ export default function PostsPage() {
         })
         .then(res => res.json())
         .then(data => setPosts(data));
-    }, []);
+    }, [API_BASE_URL]);
 
     useEffect(() => {
         fetch(`${API_BASE_URL}/mygroups`, {
@@ -74,7 +92,7 @@ export default function PostsPage() {
         })
         .then(res => res.json())
         .then(data => setMyGroups(data));
-    }, []);
+    }, [API_BASE_URL]);
 
 
     function createPost(e) {
@@ -117,7 +135,8 @@ export default function PostsPage() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 description: editDescription,
-                deadline: formattedDeadline
+                deadline: formattedDeadline,
+                status: editStatus
             })
         })
         .then(res => res.json())
@@ -214,6 +233,15 @@ export default function PostsPage() {
                                 onChange={e => setDeadline(e.target.value)}
                             />
 
+                            <select
+                                value={editStatus}
+                                onChange={e => setEditStatus(e.target.value)}
+                            >
+                                <option value="not started">Not Started</option>
+                                <option value="in progress">In Progress</option>
+                                <option value="completed">Completed</option>
+                            </select>
+
                             <button type="submit">Create</button>
                             <button type="button" onClick={() => setShowCreateModal(false)}>
                                 Cancel
@@ -240,6 +268,15 @@ export default function PostsPage() {
                                 value={editDeadline}
                                 onChange={e => setEditDeadline(e.target.value)}
                             />
+
+                            <select
+                                value={editStatus}
+                                onChange={e => setEditStatus(e.target.value)}
+                            >
+                                <option value="not started">Not Started</option>
+                                <option value="in progress">In Progress</option>
+                                <option value="completed">Completed</option>
+                            </select>
 
                             <button type="submit">Save Changes</button>
                             <button type="button" onClick={() => setShowEditModal(false)}>
