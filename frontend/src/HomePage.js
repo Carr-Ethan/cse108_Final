@@ -120,16 +120,19 @@ export default function HomePage() {
     }
 
     function leaveGroup(name) {
+        if (!window.confirm(`Leave group "${name}"?`)) return;
+
         fetch(`http://localhost:5000/groups/${name}/leave`, {
-            method: "POST",
+            method: "DELETE",
             credentials: "include"
         })
         .then(res => res.json())
         .then(data => {
-            alert(data.message);
+            alert(data.message || data.error || data);
             refreshAllData(); 
         });
     }
+
 
     function isMember(groupName) {
         return myGroups.some(g => g.name === groupName);
@@ -160,13 +163,14 @@ export default function HomePage() {
     }
 
     function deleteGroup(name) {
+        if (!window.confirm("Are you sure you want to delete this Group?")) return;
         fetch(`http://localhost:5000/groups/${name}`, {
             method: "DELETE",
             credentials: "include"
         })
         .then(res => res.json())
         .then(data => {
-            alert(data);
+            alert("Group had been Deleted.");
             refreshAllData();
         });
     }

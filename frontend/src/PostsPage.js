@@ -84,6 +84,21 @@ export default function PostsPage() {
         });
     }
 
+    function deletePost(postId) {
+        if (!window.confirm("Are you sure you want to delete this post?")) return;
+
+        fetch(`http://localhost:5000/posts/${postId}`, {
+            method: "DELETE",
+            credentials: "include"
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message || data.error || data);
+            refreshPosts();
+        });
+    }
+
+
 
     function refreshPosts() {
         fetch("http://localhost:5000/posts", {
@@ -198,6 +213,13 @@ export default function PostsPage() {
                             }}
                         >
                             Edit
+                        </button>
+
+                        <button
+                            className="delete-btn"
+                            onClick={() => deletePost(p.id)}
+                        >
+                            Delete
                         </button>
                     </div>
                 ))}
