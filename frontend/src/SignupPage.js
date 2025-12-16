@@ -49,6 +49,8 @@ export default function SignupPage() {
 
                 <button type="submit">Create Account</button>
             </form>
+
+            <p>Already have an account? <a href="/login">Sign in!</a></p>
         </div>
     );
 }

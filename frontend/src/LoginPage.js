@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LoginPage.css";
+import LoginIcon from '@mui/icons-material/Login';
 
 export default function LoginPage() {
     const [username, setUsername] = useState("");
@@ -45,17 +46,10 @@ export default function LoginPage() {
                     onChange={e => setPassword(e.target.value)}
                 />
 
-                <button type="submit">Login</button>
+                <button type="submit">Login <LoginIcon sx={{ fontSize: 12 }}></LoginIcon></button>
             </form>
 
-            <p> Don't have an account? Sign up!</p>
-
-            <button
-                className="signup-button"
-                onClick={() => navigate("/signup")}
-            >
-            Sign Up
-            </button>
+            <p> Don't have an account? <a href="/signup">Sign up!</a></p>
         </div>
     );
 }
