@@ -1,15 +1,13 @@
-export default function DataTable({ data, columns, isLoading }) {
+import "../HomePage.css";
 
-  if (isLoading) {
-    return <div className="loading">Loading data...</div>;
-  }
+export default function DataTable({ data, columns}) {
 
   if (!data || data.length === 0) {
     return <p className="empty-state">No data available.</p>;
   }
 
   return (
-    <table className="results-table">
+    <table className="results-table card-table">
       <thead>
         <tr>
           {columns.map((col) => (
@@ -17,16 +15,15 @@ export default function DataTable({ data, columns, isLoading }) {
           ))}
         </tr>
       </thead>
+
       <tbody>
         {data.map((row, index) => (
-          <tr key={index}>
+          <tr key={index} className="group-card-row">
             {columns.map((col) => (
               <td key={`${index}-${col.key}`}>
-                {col.cellRenderer 
+                {col.cellRenderer
                   ? col.cellRenderer(row)
-                  : (row[col.key] !== null && row[col.key] !== undefined 
-                    ? row[col.key] 
-                    : '-')}
+                  : row[col.key] ?? "-"}
               </td>
             ))}
           </tr>

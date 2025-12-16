@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./HomePage.css";
 import LogoutIcon from '@mui/icons-material/Logout';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import GroupRemoveIcon from '@mui/icons-material/GroupRemove';
+import PeopleIcon from '@mui/icons-material/People';
+import DeleteIcon from '@mui/icons-material/Delete';
 import DataTable from "./components/datatable";
+import CreatedGroupsTable from "./components/createdGroupsTable";
 
 export default function HomePage() {
     const [user, setUser] = useState(null);
@@ -16,9 +21,29 @@ export default function HomePage() {
     const [showMembersModal, setShowMembersModal] = useState(false);
     const [membersList, setMembersList] = useState([]);
     const [memberCounts, setMemberCounts] = useState({});
-    const [loading, setLoading] = useState(false)
 
     const navigate = useNavigate();
+
+    const membersCellRenderer = (row) => {
+        const count = memberCounts[row.name];
+        return count !== undefined ? (
+            <span>{count}</span>
+        ) : (
+            <>
+                {memberCounts[row.name] === undefined && loadMemberCount(row.name)}
+                {'...'}
+            </>
+        );
+    };
+
+    const viewMembersRenderer = (row) => (
+        <button
+            className="view-members-btn"
+            onClick={() => viewMembers(row.name)}
+        >
+            View Members <PeopleIcon sx={{ fontSize: 16 }} />
+        </button>
+    );
 
     const columns = [
         { key: 'name', header: 'Group Name' },
@@ -26,21 +51,12 @@ export default function HomePage() {
         { 
             key: 'members', 
             header: 'Members',
-            cellRenderer: (row) => {
-                const count = memberCounts[row.name];
-                return count !== undefined ? (
-                    <>
-                        <span onClick={() => viewMembers(row.name)} className="member-count-link">
-                            {count}
-                        </span>
-                    </>
-                ) : (
-                    <>
-                        {memberCounts[row.name] === undefined && loadMemberCount(row.name)}
-                        {'...'} 
-                    </>
-                );
-            }
+            cellRenderer: membersCellRenderer 
+        },
+        {
+            key: 'viewMembers',
+            header: 'View',
+            cellRenderer: viewMembersRenderer
         },
         { 
             key: 'actions', 
@@ -49,15 +65,51 @@ export default function HomePage() {
                 const isMemberOfGroup = isMember(row.name);         
                 return (
                     <button 
-                        onClick={() => isMemberOfGroup ? leaveGroup(row.name) : joinGroup(row.name)}
+                        onClick={() =>
+                            isMemberOfGroup
+                                ? leaveGroup(row.name)
+                                : joinGroup(row.name)
+                        }
                         className={isMemberOfGroup ? "leave-button" : "join-button"}
                     >
-                        {isMemberOfGroup ? "Leave Group" : "Join Group"}
+                        {isMemberOfGroup ? (
+                            <>Leave <GroupRemoveIcon sx={{ fontSize: 15 }} /></>
+                        ) : (
+                            <>Join <GroupAddIcon sx={{ fontSize: 15 }} /></>
+                        )}
                     </button>
                 );
             }
         },
     ];
+
+    const createdGroupColumns = [
+        { key: 'name', header: 'Group Name' },
+        { key: 'description', header: 'Description' },
+        { 
+            key: 'members', 
+            header: 'Members',
+            cellRenderer: membersCellRenderer
+        },
+        {
+            key: 'viewMembers',
+            header: 'View',
+            cellRenderer: viewMembersRenderer
+        },
+        { 
+            key: 'actions', 
+            header: 'Delete',
+            cellRenderer: (row) => (
+                <button 
+                    onClick={() => deleteGroup(row.name)} 
+                    className="delete-btn"
+                >
+                    Delete <DeleteIcon sx={{ fontSize: 15 }}/>
+                </button>
+            )
+        },
+    ];
+
 
     useEffect(() => {
         fetch("http://localhost:5000/me", {
@@ -225,7 +277,6 @@ function leaveGroup(name) {
     }
 
 
-
     if (!user) return <h2>Loading...</h2>;
 
     return (
@@ -321,25 +372,20 @@ function leaveGroup(name) {
             </div>
 
             <div className="group-list">
-                {activeTab === "mygroups" &&
-                    myGroups.map((g, i) => (
-                        <div key={i} className="group-card">
-                            <h3>{g.name}</h3>
-                            <p>{g.description}</p>
-                            {memberCounts[g.name] === undefined && loadMemberCount(g.name)}
-                            <p>Members: {memberCounts[g.name] ?? "..."}</p>
-                            <button onClick={() => viewMembers(g.name)}>View Members</button>
-                            <button className="leave-button" onClick={() => leaveGroup(g.name)}>
-                                Leave Group
-                            </button>
-                        </div>
-                    ))}
+                {activeTab === "mygroups" && (
+                                    <> 
+                    <div className="data-table-view">
+                    <DataTable  
+                        data={myGroups} 
+                        columns={columns} 
+                    />
+                    </div>
+                </>)}
 
                 {activeTab === "allgroups" && (
                 <> 
                     <div className="data-table-view">
                     <DataTable 
-                        isLoading={loading} 
                         data={allGroups} 
                         columns={columns} 
                     />
@@ -349,19 +395,12 @@ function leaveGroup(name) {
 
                 {activeTab === "created" &&
                     createdGroups.map((g, i) => (
-                        <div key={i} className="group-card">
-                            <h3>{g.name}</h3>
-                            <p>{g.description}</p>
-                            {memberCounts[g.name] === undefined && loadMemberCount(g.name)}
-                            <p>Members: {memberCounts[g.name] ?? "..."}</p>
-                            <button onClick={() => viewMembers(g.name)}>View Members</button>
-                            <p>Created by: {g.creator_name}</p>
-                            {g.creator_name === user.name && (
-                                <button onClick={() => deleteGroup(g.name)} className="delete-btn">
-                                    Delete Group
-                                </button>
-                            )}
-                        </div>
+                    <>
+                        <DataTable
+                            data={createdGroups} 
+                            columns={createdGroupColumns} 
+                        />
+                    </>
                     ))}
             </div>
         </div>

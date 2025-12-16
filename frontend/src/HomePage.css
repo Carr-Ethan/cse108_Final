@@ -97,7 +97,7 @@ header {
   margin-top: 10px;
 }
 
-.group-card .join-button {
+.join-button {
   padding: 8px 14px;
   background: #11c700;
   color: white;
@@ -105,9 +105,16 @@ header {
   border-radius: 6px;
   cursor: pointer;
   margin-top: 10px;
+  border: 1px solid black;
 }
 
-.group-card .leave-button {
+.join-button:hover {
+  text-decoration: underline;
+  background: #0b8100;
+}
+
+
+.leave-button, .delete-btn {
   padding: 8px 14px;
   background: #ff1717;
   color: white;
@@ -115,7 +122,12 @@ header {
   border-radius: 6px;
   cursor: pointer;
   margin-top: 10px;
-  margin-left: 10px;
+  border: 1px solid black;
+}
+
+.leave-button:hover {
+  text-decoration: underline;
+  background: #ac1010;
 }
 
 .group-card .delete-btn{
@@ -204,4 +216,59 @@ header {
 }
 .posts-btn:hover {
   background: #5a54d6;
+}
+
+.card-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0; 
+  border-radius: 12px;
+}
+
+.group-card-row td {
+  background: #fff;
+  padding: 12px 16px;
+  vertical-align: middle;
+}
+
+.group-card-row td:first-child {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.group-card-row td:last-child {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.group-card-row td {
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  background-clip: padding-box;
+}
+
+.group-card-row {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+}
+
+.card-table thead th {
+  padding: 12px 16px;
+  text-align: left;
+  background: #f5f5f5;
+}
+
+.view-members-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #1976d2;
+}
+
+.view-members-btn:hover {
+  text-decoration: underline;
 }
